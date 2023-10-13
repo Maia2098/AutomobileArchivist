@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using MF_Dev_backend_2023.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MF_Dev_backend_2023.Controllers
 {
+    [Authorize(Roles ="Admin")]
     public class UsuariosController : Controller
     {
         private readonly AppDbContext _context;
@@ -21,18 +23,26 @@ namespace MF_Dev_backend_2023.Controllers
         }
 
         // GET: Usuarios
+        
         public async Task<IActionResult> Index()
         {
               return View(await _context.Usuarios.ToListAsync());
         }
 
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
         public IActionResult Login()
         {
             return View();
         }
 
-
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(Usuario usuario)
         {
             var dados = await _context.Usuarios.FindAsync(usuario.Id);
@@ -75,6 +85,7 @@ namespace MF_Dev_backend_2023.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Logout() 
         {
             await HttpContext.SignOutAsync();
